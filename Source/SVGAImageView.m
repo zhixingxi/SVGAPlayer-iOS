@@ -54,8 +54,6 @@ static SVGAParser *sharedParser;
     else {
         self.placeHolderImageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:_imageName ofType:@"png"]];
         [sharedParser parseWithNamed:imageName inBundle:nil completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
-            [self.placeHolderImageView removeFromSuperview];
-            self.placeHolderImageView = nil;
             [self setVideoItem:videoItem];
             if (self.autoPlay) {
                 [self startAnimation];
@@ -64,4 +62,9 @@ static SVGAParser *sharedParser;
     }
 }
 
+- (void)stopAnimation:(BOOL)clear {
+    [super stopAnimation:clear];
+    [self.placeHolderImageView removeFromSuperview];
+    self.placeHolderImageView = nil;
+}
 @end

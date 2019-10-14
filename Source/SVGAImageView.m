@@ -11,10 +11,24 @@
 
 static SVGAParser *sharedParser;
 
+@interface SVGAImageView()
+
+@property (nonatomic, strong) UIImageView *placeHolderImageView;
+
+@end
+
 @implementation SVGAImageView
 
 + (void)load {
     sharedParser = [SVGAParser new];
+}
+
+- (UIImageView *)placeHolderImageView {
+    if (!_placeHolderImageView) {
+        _placeHolderImageView = [[UIImageView alloc] initWithFrame:self.bounds];
+        [self addSubview:_placeHolderImageView];
+    }
+    return _placeHolderImageView;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder
@@ -28,6 +42,7 @@ static SVGAParser *sharedParser;
 
 - (void)setImageName:(NSString *)imageName {
     _imageName = imageName;
+    
     if ([imageName hasPrefix:@"http://"] || [imageName hasPrefix:@"https://"]) {
         [sharedParser parseWithURL:[NSURL URLWithString:imageName] completionBlock:^(SVGAVideoEntity * _Nullable videoItem) {
             [self setVideoItem:videoItem];
@@ -37,7 +52,10 @@ static SVGAParser *sharedParser;
         } failureBlock:nil];
     }
     else {
+        self.placeHolderImageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:_imageName ofType:@"png"]];
         [sharedParser parseWithNamed:imageName inBundle:nil completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
+            [self.placeHolderImageView removeFromSuperview];
+            self.placeHolderImageView = nil;
             [self setVideoItem:videoItem];
             if (self.autoPlay) {
                 [self startAnimation];

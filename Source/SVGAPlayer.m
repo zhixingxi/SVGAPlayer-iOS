@@ -76,9 +76,9 @@
         return;
     } else if (self.drawLayer == nil) {
         self.videoItem = _videoItem;
+        self.loopCount = 0;
     }
     [self stopAnimation:NO];
-    self.loopCount = 0;
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(next)];
 
     self.displayLink.frameInterval = 60 / self.videoItem.FPS;

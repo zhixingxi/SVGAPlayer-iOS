@@ -334,19 +334,24 @@
 }
 
 - (void)next {
+    NSInteger currentFrame;
     if (self.reversing) {
-        self.currentFrame--;
-        if (self.currentFrame < (NSInteger)MAX(0, self.currentRange.location)) {
-            self.currentFrame = MIN(self.videoItem.frames - 1, self.currentRange.location + self.currentRange.length - 1);
+        currentFrame = self.currentFrame - 1;
+        if (currentFrame < (NSInteger)MAX(0, self.currentRange.location)) {
+            currentFrame = MIN(self.videoItem.frames - 1, self.currentRange.location + self.currentRange.length - 1);
             self.loopCount++;
+        } else {
+            self.currentFrame = currentFrame;
         }
     }
     else {
-        self.currentFrame++;
+        currentFrame = self.currentFrame + 1;
         if (self.currentFrame >= MIN(self.videoItem.frames, self.currentRange.location + self.currentRange.length)) {
-            self.currentFrame = MAX(0, self.currentRange.location);
+            currentFrame = MAX(0, self.currentRange.location);
             [self clearAudios];
             self.loopCount++;
+        } else {
+            self.currentFrame = currentFrame;
         }
     }
     if (self.loops > 0 && self.loopCount >= self.loops) {
@@ -363,6 +368,7 @@
         }
         return;
     }
+    self.currentFrame = currentFrame;
     [self update];
     id delegate = self.delegate;
     if (delegate != nil && [delegate respondsToSelector:@selector(svgaPlayerDidAnimatedToFrame:)]) {

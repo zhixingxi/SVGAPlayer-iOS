@@ -34,7 +34,7 @@ static NSOperationQueue *unzipQueue;
 - (void)parseWithURL:(nonnull NSURL *)URL
      completionBlock:(void ( ^ _Nonnull )(SVGAVideoEntity * _Nullable videoItem))completionBlock
         failureBlock:(void ( ^ _Nullable)(NSError * _Nullable error))failureBlock {
-    NSLog(@"方法调用");
+    DLog(@"方法调用");
     [self parseWithURLRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:20.0]
     completionBlock:completionBlock
        failureBlock:failureBlock];
@@ -219,7 +219,6 @@ static NSOperationQueue *unzipQueue;
     }
     if (![SVGAParser isZIPData:data]) {
         // Maybe is SVGA 2.0.0
-        DLog(@"判断是否是zip");
         [parseQueue addOperationWithBlock:^{
             NSData *inflateData = [self zlibInflate:data];
             NSError *err;

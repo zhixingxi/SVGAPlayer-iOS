@@ -134,7 +134,8 @@ static NSOperationQueue *unzipQueue;
         if ([[NSFileManager defaultManager] fileExistsAtPath:cacheDir]) {
             NSError *err;
             NSData *protoData = [NSData dataWithContentsOfFile:cacheDir];
-            SVGAProtoMovieEntity *protoObject = [SVGAProtoMovieEntity parseFromData:protoData error:&err];
+            NSData *inflateData = [self zlibInflate:protoData];
+            SVGAProtoMovieEntity *protoObject = [SVGAProtoMovieEntity parseFromData:inflateData error:&err];
             if (!err && [protoObject isKindOfClass:[SVGAProtoMovieEntity class]]) {
                 SVGAVideoEntity *videoItem = [[SVGAVideoEntity alloc] initWithProtoObject:protoObject cacheDir:cacheDir];
                 [videoItem resetImagesWithProtoObject:protoObject];

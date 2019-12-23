@@ -34,7 +34,6 @@ static NSOperationQueue *unzipQueue;
 - (void)parseWithURL:(nonnull NSURL *)URL
      completionBlock:(void ( ^ _Nonnull )(SVGAVideoEntity * _Nullable videoItem))completionBlock
         failureBlock:(void ( ^ _Nullable)(NSError * _Nullable error))failureBlock {
-    DLog(@"方法调用");
     [self parseWithURLRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:20.0]
     completionBlock:completionBlock
        failureBlock:failureBlock];
@@ -50,16 +49,16 @@ static NSOperationQueue *unzipQueue;
         return;
     }
     if ([[NSFileManager defaultManager] fileExistsAtPath:[self cacheDirectory:[self cacheKey:URLRequest.URL]]]) {
-        DLog(@"本地已存在");
+       
         [self parseWithCacheKey:[self cacheKey:URLRequest.URL] completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
-            DLog(@"解析本地存在成功");
+           
             if (completionBlock) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     completionBlock(videoItem);
                 }];
             }
         } failureBlock:^(NSError * _Nonnull error) {
-            DLog(@"解析本地存在失败");
+           
             [self clearCache:[self cacheKey:URLRequest.URL]];
             if (failureBlock) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -69,10 +68,10 @@ static NSOperationQueue *unzipQueue;
         }];
         return;
     }
-    DLog(@"本地不存在，加载网络");
+  
     [[[NSURLSession sharedSession] dataTaskWithRequest:URLRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (error == nil && data != nil) {
-            DLog(@"加载网络成功");
+           
             [self parseWithData:data cacheKey:[self cacheKey:URLRequest.URL] completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
                 if (completionBlock) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -205,7 +204,6 @@ static NSOperationQueue *unzipQueue;
              cacheKey:(nonnull NSString *)cacheKey
       completionBlock:(void ( ^ _Nullable)(SVGAVideoEntity * _Nonnull videoItem))completionBlock
          failureBlock:(void ( ^ _Nullable)(NSError * _Nonnull error))failureBlock {
-    DLog(@"加载网络后解析数据并缓存");
     
     SVGAVideoEntity *cacheItem = [SVGAVideoEntity readCache:cacheKey];
     if (cacheItem != nil) {
@@ -228,16 +226,13 @@ static NSOperationQueue *unzipQueue;
             }
             NSData *inflateData = [self zlibInflate:data];
             NSError *err;
-            DLog(@"不是zip直接解析");
             SVGAProtoMovieEntity *protoObject = [SVGAProtoMovieEntity parseFromData:inflateData error:&err];
             if (!err && [protoObject isKindOfClass:[SVGAProtoMovieEntity class]]) {
-                DLog(@"不是zip直接解析成功");
                 SVGAVideoEntity *videoItem = [[SVGAVideoEntity alloc] initWithProtoObject:protoObject cacheDir:@""];
                 [videoItem resetImagesWithProtoObject:protoObject];
                 [videoItem resetSpritesWithProtoObject:protoObject];
                 [videoItem resetAudiosWithProtoObject:protoObject];
                 if (self.enabledMemoryCache) {
-                    DLog(@"缓存Item");
                     [videoItem saveCache:cacheKey];
                 }
                 if (completionBlock) {

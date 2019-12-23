@@ -31,4 +31,6 @@
        completionBlock:(void ( ^ _Nullable)(SVGAVideoEntity * _Nonnull videoItem))completionBlock
           failureBlock:(void ( ^ _Nullable)(NSError * _Nonnull error))failureBlock;
 
++ (void)clearSvgaCache;
+
 @end

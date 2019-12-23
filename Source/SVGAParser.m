@@ -358,7 +358,23 @@ static NSOperationQueue *unzipQueue;
 
 - (nullable NSString *)cacheDirectory:(NSString *)cacheKey {
     NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
-    return [cacheDir stringByAppendingFormat:@"/%@", cacheKey];
+    NSString *svgaDir = [cacheDir stringByAppendingPathComponent:@"svgasource"];
+    BOOL isDir = NO;
+    BOOL existed = [[NSFileManager defaultManager] fileExistsAtPath:svgaDir isDirectory:&isDir];
+    if (!(isDir == YES && existed == YES)) {
+        [[NSFileManager defaultManager]createDirectoryAtPath:svgaDir withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    return [svgaDir stringByAppendingFormat:@"/%@", cacheKey];
+}
+
++ (void)clearSvgaCache {
+    NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *svgaDir = [cacheDir stringByAppendingPathComponent:@"svgasource"];
+    BOOL isDir = NO;
+    BOOL existed = [[NSFileManager defaultManager] fileExistsAtPath:svgaDir isDirectory:&isDir];
+    if ((isDir == YES && existed == YES)) {
+        [[NSFileManager defaultManager]removeItemAtPath:svgaDir error:nil];
+    }
 }
 
 - (NSString *)MD5String:(NSString *)str {

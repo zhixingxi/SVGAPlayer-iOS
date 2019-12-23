@@ -131,9 +131,9 @@ static NSOperationQueue *unzipQueue;
             return;
         }
         NSString *cacheDir = [self cacheDirectory:cacheKey];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:[cacheDir stringByAppendingString:@"/movie.binary"]]) {
+        if ([[NSFileManager defaultManager] fileExistsAtPath:cacheDir]) {
             NSError *err;
-            NSData *protoData = [NSData dataWithContentsOfFile:[cacheDir stringByAppendingString:@"/movie.binary"]];
+            NSData *protoData = [NSData dataWithContentsOfFile:cacheDir];
             SVGAProtoMovieEntity *protoObject = [SVGAProtoMovieEntity parseFromData:protoData error:&err];
             if (!err && [protoObject isKindOfClass:[SVGAProtoMovieEntity class]]) {
                 SVGAVideoEntity *videoItem = [[SVGAVideoEntity alloc] initWithProtoObject:protoObject cacheDir:cacheDir];

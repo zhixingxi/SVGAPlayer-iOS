@@ -34,6 +34,7 @@ static NSOperationQueue *unzipQueue;
 - (void)parseWithURL:(nonnull NSURL *)URL
      completionBlock:(void ( ^ _Nonnull )(SVGAVideoEntity * _Nullable videoItem))completionBlock
         failureBlock:(void ( ^ _Nullable)(NSError * _Nullable error))failureBlock {
+     NSLog(@"测试本地集成");
     [self parseWithURLRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:20.0]
     completionBlock:completionBlock
        failureBlock:failureBlock];

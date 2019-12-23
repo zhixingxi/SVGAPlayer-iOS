@@ -205,6 +205,7 @@ static NSOperationQueue *unzipQueue;
       completionBlock:(void ( ^ _Nullable)(SVGAVideoEntity * _Nonnull videoItem))completionBlock
          failureBlock:(void ( ^ _Nullable)(NSError * _Nonnull error))failureBlock {
     DLog(@"加载网络后解析数据并缓存");
+    
     SVGAVideoEntity *cacheItem = [SVGAVideoEntity readCache:cacheKey];
     if (cacheItem != nil) {
         if (completionBlock) {
@@ -220,6 +221,10 @@ static NSOperationQueue *unzipQueue;
     if (![SVGAParser isZIPData:data]) {
         // Maybe is SVGA 2.0.0
         [parseQueue addOperationWithBlock:^{
+            NSString *storePath = [self cacheDirectory:cacheKey];
+            if (![[NSFileManager defaultManager] fileExistsAtPath:[self cacheDirectory:cacheKey]]) {
+                [data writeToFile:storePath atomically:YES];
+            }
             NSData *inflateData = [self zlibInflate:data];
             NSError *err;
             DLog(@"不是zip直接解析");

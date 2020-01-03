@@ -215,9 +215,9 @@ static NSOperationQueue *unzipQueue;
         return;
     }
     if (!data || data.length < 4) {
-        if (completionBlock) {
+        if (failureBlock) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                completionBlock(cacheItem);
+                failureBlock([NSError errorWithDomain:@"Data Error" code:-1 userInfo:nil]);
             }];
         }
         return;

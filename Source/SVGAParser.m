@@ -215,6 +215,11 @@ static NSOperationQueue *unzipQueue;
         return;
     }
     if (!data || data.length < 4) {
+        if (completionBlock) {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                completionBlock(cacheItem);
+            }];
+        }
         return;
     }
     if (![SVGAParser isZIPData:data]) {

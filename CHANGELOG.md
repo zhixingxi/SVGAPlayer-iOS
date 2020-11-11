@@ -1,4 +1,16 @@
-# SVGAPlayer-iOS CHANGELOG (2019-10-15)
+# SVGAPlayer-iOS CHANGELOG (2020-11-10)
+
+## [2.5.6](https://github.com/svga/SVGAPlayer-iOS/tree/2.5.6)(2020-11-10)
+### Bug Fixes
+* Fix: play with range error. ([db92d48](https://github.com/yyued/SVGAPlayer-iOS/commit/db92d48))
+
+## [2.5.5](https://github.com/svga/SVGAPlayer-iOS/tree/2.5.5)(2020-10-15)
+### Bug Fixes
+* Fix: Add semaphore lock to videoCache and  weakCache. ([5b3e530](https://github.com/yyued/SVGAPlayer-iOS/commit/5b3e530))
+
+## [2.5.4](https://github.com/yyued/SVGAPlayer-iOS/tree/2.5.0-release)(2020-05-28)
+### Bug Fixes
+* Fix: audio could not play. ([cd6cca8](https://github.com/yyued/SVGAPlayer-iOS/commit/cd6cca8))
 
 ## [2.5.0](https://github.com/yyued/SVGAPlayer-iOS/tree/2.5.0-release)(2019-10-15)
 

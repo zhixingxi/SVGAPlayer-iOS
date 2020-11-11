@@ -31,7 +31,6 @@
 @property (nonatomic, assign) NSRange currentRange;
 @property (nonatomic, assign) BOOL forwardAnimating;
 @property (nonatomic, assign) BOOL reversing;
-@property (nonatomic, assign) BOOL audioPlaying;
 
 @end 
 
@@ -79,14 +78,30 @@
     }
     [self stopAnimation:NO];
     self.loopCount = 0;
+    if (self.videoItem.FPS == 0) {
+        NSLog(@"videoItem FPS could not be 0！");
+        return;
+    }
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(next)];
-
     self.displayLink.frameInterval = 60 / self.videoItem.FPS;
-    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:self.mainRunLoopMode];
     self.forwardAnimating = !self.reversing;
 }
 
 - (void)startAnimationWithRange:(NSRange)range reverse:(BOOL)reverse {
+    if (self.videoItem == nil) {
+        NSLog(@"videoItem could not be nil！");
+        return;
+    } else if (self.drawLayer == nil) {
+        self.videoItem = _videoItem;
+    }
+    [self stopAnimation:NO];
+    self.loopCount = 0;
+    if (self.videoItem.FPS == 0) {
+        NSLog(@"videoItem FPS could not be 0！");
+        return;
+    }
+    
     self.currentRange = range;
     self.reversing = reverse;
     if (reverse) {
@@ -95,7 +110,10 @@
     else {
         self.currentFrame = MAX(0, range.location);
     }
-    [self startAnimation];
+    self.forwardAnimating = !self.reversing;
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(next)];
+    self.displayLink.frameInterval = 60 / self.videoItem.FPS;
+    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:self.mainRunLoopMode];
 }
 
 - (void)pauseAnimation {
@@ -125,13 +143,12 @@
 }
 
 - (void)clearAudios {
-    if (!self.audioPlaying) {
-        return;
-    }
     for (SVGAAudioLayer *layer in self.audioLayers) {
-        [layer.audioPlayer stop];
+        if (layer.audioPlaying) {
+            [layer.audioPlayer stop];
+            layer.audioPlaying = NO;
+        }
     }
-    self.audioPlaying = NO;
 }
 
 - (void)stepToFrame:(NSInteger)frame andPlay:(BOOL)andPlay {
@@ -149,9 +166,13 @@
     [self update];
     if (andPlay) {
         self.forwardAnimating = YES;
+        if (self.videoItem.FPS == 0) {
+            NSLog(@"videoItem FPS could not be 0！");
+            return;
+        }
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(next)];
         self.displayLink.frameInterval = 60 / self.videoItem.FPS;
-        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:self.mainRunLoopMode];
     }
 }
 
@@ -324,14 +345,14 @@
     [CATransaction setDisableActions:NO];
     if (self.forwardAnimating && self.audioLayers.count > 0) {
         for (SVGAAudioLayer *layer in self.audioLayers) {
-            if (!self.audioPlaying && layer.audioItem.startFrame >= self.currentFrame) {
+            if (!layer.audioPlaying && layer.audioItem.startFrame <= self.currentFrame && self.currentFrame <= layer.audioItem.endFrame) {
                 [layer.audioPlayer setCurrentTime:(NSTimeInterval)(layer.audioItem.startTime / 1000)];
                 [layer.audioPlayer play];
-                self.audioPlaying = YES;
+                layer.audioPlaying = YES;
             }
-            if (self.audioPlaying && layer.audioItem.endFrame <= self.currentFrame) {
+            if (layer.audioPlaying && layer.audioItem.endFrame <= self.currentFrame) {
                 [layer.audioPlayer stop];
-                self.audioPlaying = NO;
+                layer.audioPlaying = NO;
             }
         }
     }
@@ -516,6 +537,13 @@
         _dynamicDrawings = @{};
     }
     return _dynamicDrawings;
+}
+
+- (NSRunLoopMode)mainRunLoopMode {
+    if (!_mainRunLoopMode) {
+        _mainRunLoopMode = NSRunLoopCommonModes;
+    }
+    return _mainRunLoopMode;
 }
 
 @end
